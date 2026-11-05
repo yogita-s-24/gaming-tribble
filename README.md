@@ -19,6 +19,7 @@ python tribble_run.py
 | Space / Up / W / Z      | Jump (hold for a higher jump) |
 | Shift / X               | Run                           |
 | P                       | Pause                         |
+| M                       | Mute / unmute music           |
 | Enter                   | Start / restart               |
 | Esc                     | Quit                          |
 
@@ -42,3 +43,9 @@ just above the ground. Use these helpers:
 - `enemies` lists where the Grumbles start
 
 Tile characters: `#` ground, `B` brick, `?` bonus block, `S` stone, `C` coin.
+
+## Music
+
+The game plays an original chiptune loop that is generated in code when it starts, so no audio
+files are needed. To use your own track instead, put it at `assets/music.ogg` (or `music.mp3` /
+`music.wav`) and it will loop in place of the built-in tune. Press **M** to mute.

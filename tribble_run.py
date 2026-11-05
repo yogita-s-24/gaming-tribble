@@ -6,6 +6,7 @@ Controls
     Space / Up / W / Z        jump (hold for a higher jump)
     Shift / X                 run
     P                         pause
+    M                         mute / unmute music
     Enter                     start / restart
     Esc                       quit
 """
@@ -14,6 +15,8 @@ import random
 import sys
 
 import pygame
+
+from music import Music
 
 # --------------------------------------------------------------------------- settings
 WIDTH, HEIGHT = 800, 480
@@ -411,7 +414,9 @@ class Game:
         self.state = "title"  # title | play | dying | win | gameover
         self.paused = False
         self.tick = 0
+        self.music = Music()
         self.new_game()
+        self.music.play()
 
     # ----------------------------------------------------------------- setup
     def new_game(self):
@@ -448,6 +453,12 @@ class Game:
                         jump_pressed = True
                     if event.key == pygame.K_p and self.state == "play":
                         self.paused = not self.paused
+                        if self.paused:
+                            self.music.pause()
+                        else:
+                            self.music.unpause()
+                    if event.key == pygame.K_m:
+                        self.music.toggle_mute()
                     if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                         self.press_enter()
             self.update(jump_pressed)
@@ -461,6 +472,7 @@ class Game:
         elif self.state == "gameover" or (self.state == "win" and self.win_phase == "done"):
             self.new_game()
             self.state = "play"
+            self.music.play()
 
     @staticmethod
     def quit():
@@ -591,6 +603,7 @@ class Game:
             return
         self.state = "dying"
         self.state_timer = 0
+        self.music.stop()
         self.player.vx = 0.0
         self.player.vy = -11.0
 
@@ -607,11 +620,13 @@ class Game:
             else:
                 self.load_level()
                 self.state = "play"
+                self.music.play()
 
     def start_win(self):
         lvl, p = self.level, self.player
         self.state = "win"
         self.win_phase = "slide"
+        self.music.stop()
         height = (lvl.pole_bottom - p.rect.bottom) / (lvl.pole_bottom - lvl.pole_top)
         bonus = 100 + int(max(0.0, min(1.0, height)) * 49) * 100
         self.add_score(bonus, lvl.pole_x, p.rect.top)
@@ -814,7 +829,7 @@ class Game:
             self.screen.blit(self.shade, (0, 0))
             self.text("TRIBBLE RUN", self.font_big, (255, 220, 90), (mid, 140), center=True)
             lines = ["Arrows / A D : move      Space / W / Up : jump",
-                     "Shift / X : run      P : pause      Esc : quit",
+                     "Shift / X : run    P : pause    M : music    Esc : quit",
                      "Stomp the Grumbles, bump blocks, grab coins",
                      "and reach the flag!"]
             for i, line in enumerate(lines):
